@@ -164,12 +164,12 @@ limit = 300
 ; site
 batchsize = 10
 
-[model]
+;[model]
 ; name of data model class to load and directory for storage
 ; the default model "Filesystem" stores everything in the filesystem
-class = Filesystem
-[model_options]
-dir = PATH "data"
+;class = Filesystem
+;[model_options]
+;dir = PATH "data"
 
 ;[model]
 ; example of a Google Cloud Storage configuration
@@ -179,15 +179,15 @@ dir = PATH "data"
 ;prefix = "pastes"
 ;uniformacl = false
 
-;[model]
+[model]
 ; example of DB configuration for MySQL
-;class = Database
-;[model_options]
-;dsn = "mysql:host=localhost;dbname=privatebin;charset=UTF8"
-;tbl = "privatebin_"	; table prefix
-;usr = "privatebin"
-;pwd = "Z3r0P4ss"
-;opt[12] = true	  ; PDO::ATTR_PERSISTENT
+class = Database
+[model_options]
+dsn = "mysql:host=zerone-addon-412-12-mariadb.zerone-149-412.svc.cluster.local;dbname=test;charset=UTF8"
+tbl = "privatebin_"     ; table prefix
+usr = "admin"
+pwd = "Asdfg!2345"
+opt[12] = true    ; PDO::ATTR_PERSISTENT
 
 ;[model]
 ; example of DB configuration for SQLite
