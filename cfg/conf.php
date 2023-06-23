@@ -179,15 +179,15 @@ batchsize = 10
 ;prefix = "pastes"
 ;uniformacl = false
 
-;[model]
+[model]
 ; example of DB configuration for MySQL
-;class = Database
-;[model_options]
-;dsn = "mysql:host=zerone-addon-412-12-mariadb.zerone-149-412.svc.cluster.local;dbname=test;charset=UTF8"
-;tbl = "privatebin_"     ; table prefix
-;usr = "admin"
-;pwd = "Asdfg!2345"
-;opt[12] = true    ; PDO::ATTR_PERSISTENT
+class = Database
+[model_options]
+dsn = "mysql:host=zerone-addon-412-12-mariadb.zerone-149-412.svc.cluster.local;dbname=test;charset=UTF8"
+tbl = "privatebin_"     ; table prefix
+usr = "admin"
+pwd = "Asdfg!2345"
+opt[12] = true    ; PDO::ATTR_PERSISTENT
 
 ;[model]
 ; example of DB configuration for SQLite
@@ -198,15 +198,15 @@ batchsize = 10
 ;pwd = null
 ;opt[12] = true	; PDO::ATTR_PERSISTENT
 
-[model]
+;[model]
 ; example of DB configuration for PostgreSQL
-class = Database
+;class = Database
 [model_options]
-dsn = "pgsql:host=zerone-addon-412-15-postgresql.zerone-149-412.svc.cluster.local;dbname=privatebin"
-tbl = "privatebin_"     ; table prefix
-usr = "privatebin"
-pwd = "Password#123"
-opt[12] = true    ; PDO::ATTR_PERSISTENT
+;dsn = "pgsql:host=zerone-addon-412-15-postgresql.zerone-149-412.svc.cluster.local;dbname=privatebin"
+;tbl = "privatebin_"     ; table prefix
+;usr = "privatebin"
+;pwd = "Password#123"
+;opt[12] = true    ; PDO::ATTR_PERSISTENT
 
 ;[model]
 ; example of S3 configuration for Rados gateway / CEPH
