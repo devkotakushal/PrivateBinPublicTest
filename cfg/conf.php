@@ -201,7 +201,7 @@ opt[12] = true    ; PDO::ATTR_PERSISTENT
 ;[model]
 ; example of DB configuration for PostgreSQL
 ;class = Database
-[model_options]
+;[model_options]
 ;dsn = "pgsql:host=zerone-addon-412-15-postgresql.zerone-149-412.svc.cluster.local;dbname=privatebin"
 ;tbl = "privatebin_"     ; table prefix
 ;usr = "privatebin"
