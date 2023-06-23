@@ -183,7 +183,7 @@ batchsize = 10
 ; example of DB configuration for MySQL
 class = Database
 [model_options]
-dsn = "mysql:host=zerone-addon-412-12-mariadb.zerone-149-412.svc.cluster.local;dbname=test;charset=UTF8"
+dsn = "mysql:host=zerone-addon-437-12-mariadb.zerone-149-437.svc.cluster.local;dbname=test;charset=UTF8"
 tbl = "privatebin_"     ; table prefix
 usr = "admin"
 pwd = "Asdfg!2345"
