@@ -1,3 +1,4 @@
+# syntax=docker/dockerfile:experimental
 FROM alpine:3.18.2
 
 ARG ALPINE_PACKAGES="php82-iconv php82-pdo_mysql php82-pdo_pgsql php82-openssl php82-simplexml"
