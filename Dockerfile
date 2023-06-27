@@ -91,7 +91,7 @@ RUN \
     && apk del --no-cache gnupg git ${ALPINE_COMPOSER_PACKAGES}
 
 COPY etc/ /etc/
-COPY conf.php /srv/conf.php
+COPY conf.php /srv/cfg/conf.php
 
 WORKDIR /var/www
 # user nobody, group www-data
