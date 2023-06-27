@@ -1,110 +1,210 @@
-# [![PrivateBin](https://cdn.rawgit.com/PrivateBin/assets/master/images/preview/logoSmall.png)](https://privatebin.info/)
+# PrivateBin on Nginx, php-fpm & Alpine
 
-*Current version: 1.5.1*
+**PrivateBin** is a minimalist, open source online [pastebin](https://en.wikipedia.org/wiki/Pastebin) where the server has zero knowledge of pasted data. Data is encrypted and decrypted in the browser using 256bit AES in [Galois Counter mode](https://en.wikipedia.org/wiki/Galois/Counter_Mode).
 
-**PrivateBin** is a minimalist, open source online
-[pastebin](https://en.wikipedia.org/wiki/Pastebin)
-where the server has zero knowledge of pasted data.
+This repository contains the Dockerfile and resources needed to create a docker image with a pre-installed PrivateBin instance in a secure default configuration. The images are based on the docker hub Alpine image, extended with the GD module required to generate discussion avatars and the Nginx webserver to serve static JavaScript libraries, CSS & the logos. All logs of php-fpm and Nginx (access & errors) are forwarded to docker logs.
 
-Data is encrypted and decrypted in the browser using 256bit AES in
-[Galois Counter mode](https://en.wikipedia.org/wiki/Galois/Counter_Mode).
+## Image variants
 
-This is a fork of ZeroBin, originally developed by
-[Sébastien Sauvage](https://github.com/sebsauvage/ZeroBin). PrivateBin was
-refactored to allow easier and cleaner extensions and has many additional
-features. It is, however, still fully compatible to the original ZeroBin 0.19
-data storage scheme. Therefore, such installations can be upgraded to PrivateBin
-without losing any data.
+This is the all-in-one image ([Docker Hub](https://hub.docker.com/r/privatebin/nginx-fpm-alpine/) / [GitHub](https://github.com/orgs/PrivateBin/packages/container/package/nginx-fpm-alpine)) that can be used with any storage backend supported by PrivateBin - file based storage, databases, Google Cloud or S3 Storage. We also offer dedicated images for each backend:
+- [Image for file based storage (Docker Hub](https://hub.docker.com/r/privatebin/fs) / [GitHub](https://github.com/orgs/PrivateBin/packages/container/package/fs))
+- [Image for PostgreSQL, MariaDB & MySQL (Docker Hub](https://hub.docker.com/r/privatebin/pdo) / [GitHub](https://github.com/orgs/PrivateBin/packages/container/package/pdo))
+- [Image for Google Cloud Storage (Docker Hub](https://hub.docker.com/r/privatebin/gcs) / [GitHub](https://github.com/orgs/PrivateBin/packages/container/package/gcs))
+- [Image for S3 Storage (Docker Hub](https://hub.docker.com/r/privatebin/s3) / [GitHub](https://github.com/orgs/PrivateBin/packages/container/package/s3))
 
-## What PrivateBin provides
+## Image tags
 
-+ As a server administrator you don't have to worry if your users post content
-  that is considered illegal in your country. You have plausible deniability of
-  any of the pastes content. If requested or enforced, you can delete any paste
-  from your system.
+All images contain a release version of PrivateBin and are offered with the following tags:
+- `latest` is an alias of the latest pushed image, usually the same as `nightly`, but excluding `edge`
+- `nightly` is the latest released PrivateBin version on an upgraded Alpine release image, including the latest changes from the docker image repository
+- `edge` is the latest released PrivateBin version on an upgraded Alpine edge image
+- `stable` contains the latest PrivateBin release on the latest tagged release of the [docker image git repository](https://github.com/PrivateBin/docker-nginx-fpm-alpine) - gets updated when important security fixes are released for Alpine or upon new Alpine releases
+- `1.5.1` contains PrivateBin version 1.5.1 on the latest tagged release of the [docker image git repository](https://github.com/PrivateBin/docker-nginx-fpm-alpine) - gets updated when important security fixes are released for Alpine or upon new Alpine releases, same as stable
+- `1.5.1-...` are provided for selecting specific, immutable images
 
-+ Pastebin-like system to store text documents, code samples, etc.
+If you update your images automatically via pulls, the `stable`, `nightly` or `latest` are recommended. If you prefer to have control and reproducability or use a form of orchestration, the numeric tags are probably preferable. The `edge` tag offers a preview of software in future Alpine releases and serves as an early warning system to detect image build issues in these.
 
-+ Encryption of data sent to server.
+## Image registries
 
-+ Possibility to set a password which is required to read the paste. It further
-  protects a paste and prevents people stumbling upon your paste's link
-  from being able to read it without the password.
+These images are hosted on the Docker Hub and the GitHub container registries:
+- [Images on Docker Hub](https://hub.docker.com/u/privatebin), which are prefixed `privatebin` or `docker.io/privatebin`
+- [Images on GitHub](https://github.com/orgs/PrivateBin/packages), which are prefixed `ghcr.io/privatebin`
 
-## What it doesn't provide
+## Running the image
 
-- As a user you have to trust the server administrator not to inject any
-  malicious code. For security, a PrivateBin installation *has to be used over*
-  *HTTPS*! Otherwise you would also have to trust your internet provider, and
-  any jurisdiction the traffic passes through. Additionally the instance should
-  be secured by
-  [HSTS](https://en.wikipedia.org/wiki/HTTP_Strict_Transport_Security). It can
-  use traditional certificate authorities and/or use a
-  [DNSSEC](https://en.wikipedia.org/wiki/Domain_Name_System_Security_Extensions)
-  protected
-  [DANE](https://en.wikipedia.org/wiki/DNS-based_Authentication_of_Named_Entities)
-  record.
+Assuming you have docker successfully installed and internet access, you can fetch and run the image from the docker hub like this:
 
-- The "key" used to encrypt the paste is part of the URL. If you publicly post
-  the URL of a paste that is not password-protected, anyone can read it.
-  Use a password if you want your paste to remain private. In that case, make
-  sure to use a strong password and share it privately and end-to-end-encrypted.
+```console
+$ docker run -d --restart="always" --read-only -p 8080:8080 -v $PWD/privatebin-data:/srv/data privatebin/nginx-fpm-alpine
+```
 
-- A server admin can be forced to hand over access logs to the authorities.
-  PrivateBin encrypts your text and the discussion contents, but who accessed a
-  paste (first) might still be disclosed via access logs.
+The parameters in detail:
 
-- In case of a server breach your data is secure as it is only stored encrypted
-  on the server. However, the server could be absused or the server admin could
-  be legally forced into sending malicious code to their users, which logs
-  the decryption key and sends it to a server when a user accesses a paste.
-  Therefore, do not access any PrivateBin instance if you think it has been
-  compromised. As long as no user accesses this instance with a previously
-  generated URL, the content can't be decrypted.
+- `-v $PWD/privatebin-data:/srv/data` - replace `$PWD/privatebin-data` with the path to the folder on your system, where the pastes and other service data should be persisted. This guarantees that your pastes aren't lost after you stop and restart the image or when you replace it. May be skipped if you just want to test the image or use database or Google Cloud Storage backend.
+- `-p 8080:8080` - The Nginx webserver inside the container listens on port 8080, this parameter exposes it on your system on port 8080. Be sure to use a reverse proxy for HTTPS termination in front of it in production environments.
+- `--read-only` - This image supports running in read-only mode. Using this reduces the attack surface slightly, since an exploit in one of the images services can't overwrite arbitrary files in the container. Only /tmp, /var/tmp, /var/run & /srv/data may be written into.
+- `-d` - launches the container in the background. You can use `docker ps` and `docker logs` to check if the container is alive and well.
+- `--restart="always"` - restart the container if it crashes, mainly useful for production setups
 
-## Options
+> Note that the volume mounted must be owned by UID 65534 / GID 82. If you run the container in a docker instance with "userns-remap" you need to add your subuid/subgid range to these numbers.
 
-Some features are optional and can be enabled or disabled in the [configuration
-file](https://github.com/PrivateBin/PrivateBin/wiki/Configuration):
+### Custom configuration
 
-* Password protection
+In case you want to use a customized [conf.php](https://github.com/PrivateBin/PrivateBin/blob/master/cfg/conf.sample.php) file, for example one that has file uploads enabled or that uses a different template, add the file as a second volume:
 
-* Discussions, anonymous or with nicknames and IP based identicons or vizhashes
+```console
+$ docker run -d --restart="always" --read-only -p 8080:8080 -v $PWD/conf.php:/srv/cfg/conf.php:ro -v $PWD/privatebin-data:/srv/data privatebin/nginx-fpm-alpine
+```
 
-* Expiration times, including a "forever" and "burn after reading" option
+Note: The `Filesystem` data storage is supported out of the box. The image includes PDO modules for MySQL and PostgreSQL, required for the `Database` one, but you still need to keep the /srv/data persisted for the server salt and the traffic limiter when using a release before 1.4.0.
 
-* Markdown format support for HTML formatted pastes, including preview function
+### Adjusting nginx or php-fpm settings
 
-* Syntax highlighting for source code using prettify.js, including 4 prettify
-  themes
+You can attach your own `php.ini` or nginx configuration files to the folders `/etc/php/conf.d/` and `/etc/nginx/http.d/` respectively. This would for example let you adjust the maximum size these two services accept for file uploads, if you need more then the default 10 MiB.
 
-* File upload support, image, media and PDF preview (disabled by default, size
-  limit adjustable)
+### Timezone settings
 
-* Templates: By default there are bootstrap CSS, darkstrap and "classic ZeroBin"
-  to choose from and it is easy to adapt these to your own websites layout or
-  create your own.
+The image supports the use of the following two environment variables to adjust the timezone. This is most useful to ensure the logs show the correct local time.
 
-* Translation system and automatic browser language detection (if enabled in
-  browser)
+- `TZ`
+- `PHP_TZ`
 
-* Language selection (disabled by default, as it uses a session cookie)
+Note: The application internally handles expiration of pastes based on a UNIX timestamp that is calculated based on the timezone set during its creation. Changing the PHP_TZ will affect this and leads to earlier (if the timezone is increased) or later (if it is decreased) expiration then expected.
 
-* QR code for paste URLs, to easily transfer them over to mobile devices
+### Kubernetes deployment
 
-## Further resources
+Below is an example deployment for Kubernetes.
 
-* [FAQ](https://github.com/PrivateBin/PrivateBin/wiki/FAQ)
+```yaml
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: privatebin-deployment
+  labels:
+    app: privatebin
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: privatebin
+  template:
+    metadata:
+      labels:
+        app: privatebin
+    spec:
+      securityContext:
+        runAsUser: 65534
+        runAsGroup: 82
+        fsGroup: 82
+      containers:
+      - name: privatebin
+        image: privatebin/nginx-fpm-alpine:stable
+        ports:
+        - containerPort: 8080
+        env:
+        - name: TZ
+          value: Antarctica/South_Pole
+        - name: PHP_TZ
+          value: Antarctica/South_Pole
+        securityContext:
+          readOnlyRootFilesystem: true
+          privileged: false
+          allowPrivilegeEscalation: false
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 8080
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 8080
+        volumeMounts:
+        - mountPath: /srv/data
+          name: privatebin-data
+          readOnly: False
+        - mountPath: /run
+          name: run
+          readOnly: False
+        - mountPath: /tmp
+          name: tmp
+          readOnly: False
+        - mountPath: /var/lib/nginx/tmp
+          name: nginx-cache
+          readOnly: False
+  volumes:
+    - name: run
+      emptyDir:
+        medium: "Memory"
+    - name: tmp
+      emptyDir:
+        medium: "Memory"
+    - name: nginx-cache
+      emptyDir: {}
+```
 
-* [Installation guide](https://github.com/PrivateBin/PrivateBin/blob/master/INSTALL.md#installation)
+Note that the volume `privatebin-data` has to be a shared, persisted volume across all nodes, i.e. on an NFS share. As of PrivateBin 1.4.0 it is no longer required, when using a database or Google Cloud Storage.
 
-* [Configuration guide](https://github.com/PrivateBin/PrivateBin/wiki/Configuration)
+## Running administrative scripts
 
-* [Templates](https://github.com/PrivateBin/PrivateBin/wiki/Templates)
+The image includes two administrative scripts, which you can use to migrate from one storage backend to another, delete pastes by ID, removing empty directories when using the Filesystem backend, to purge all expired pastes and display statistics. These can be executed within the running image or by running the commands as alternative entrypoints with the same volumes attached as in the running service image, the former option is recommended.
 
-* [Translation guide](https://github.com/PrivateBin/PrivateBin/wiki/Translation)
+```console
+# assuming you named your container "privatebin" using the option: --name privatebin
 
-* [Developer guide](https://github.com/PrivateBin/PrivateBin/wiki/Development)
+$ docker exec -t privatebin administration --help
+Usage:
+  administration [--delete <paste id> | --empty-dirs | --help | --purge | --statistics]
 
-Run into any issues? Have ideas for further developments? Please
-[report](https://github.com/PrivateBin/PrivateBin/issues) them!
+Options:
+  -d, --delete      deletes the requested paste ID
+  -e, --empty-dirs  removes empty directories (only if Filesystem storage is
+                    configured)
+  -h, --help        displays this help message
+  -p, --purge       purge all expired pastes
+  -s, --statistics  reads all stored pastes and comments and reports statistics
+
+docker exec -t privatebin migrate --help
+migrate - Copy data between PrivateBin backends
+
+Usage:
+  migrate [--delete-after] [--delete-during] [-f] [-n] [-v] srcconfdir
+          [<dstconfdir>]
+  migrate [-h|--help]
+
+Options:
+  --delete-after   delete data from source after all pastes and comments have
+                   successfully been copied to the destination
+  --delete-during  delete data from source after the current paste and its
+                   comments have successfully been copied to the destination
+  -f               forcefully overwrite data which already exists at the
+                   destination
+  -h, --help       displays this help message
+  -n               dry run, do not copy data
+  -v               be verbose
+  <srcconfdir>     use storage backend configration from conf.php found in
+                   this directory as source
+  <dstconfdir>     optionally, use storage backend configration from conf.php
+                   found in this directory as destination; defaults to:
+                   /srv/bin/../cfg/conf.php
+```
+
+Note that in order to migrate between different storage backends you will need to use the all-in-one image called `privatebin/nginx-fpm-alpine`, as it comes with all the drivers and libraries for the different supported backends. When using the variant images, you will only be able to migrate within two backends of the same storage type, for example two filesystem paths or two database backends.
+
+## Rolling your own image
+
+To reproduce the image, run:
+
+```console
+$ docker build -t privatebin/nginx-fpm-alpine .
+```
+
+### Behind the scenes
+
+The two processes, Nginx and php-fpm, are started by s6.
+
+Nginx is required to serve static files and caches them, too. Requests to the index.php (which is the only PHP file exposed in the document root at /var/www) are passed to php-fpm via a socket at /run/php-fpm.sock. All other PHP files and the data are stored under /srv.
+
+The Nginx setup supports only HTTP, so make sure that you run a reverse proxy in front of this for HTTPS offloading and reducing the attack surface on your TLS stack. The Nginx in this image is set up to deflate/gzip text content.
+
+During the build of the image, the PrivateBin release archive is downloaded from Github. All the downloaded Alpine packages and the PrivateBin archive are validated using cryptographic signatures to ensure they have not been tempered with, before deploying them in the image.
