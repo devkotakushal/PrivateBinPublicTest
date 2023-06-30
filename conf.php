@@ -202,10 +202,10 @@ batchsize = 10
 ; example of DB configuration for PostgreSQL
 class = Database
 [model_options]
-dsn = "pgsql:host=lucky.db.elephantsql.com;dbname=rrrppbqq"
+dsn = "pgsql:host=zerone-addon-8631-78-postgresql.zerone-4311-8631.svc.cluster.local;dbname=rrrppbqq"
 tbl = "privatebin_"     ; table prefix
 usr = "rrrppbqq"
-pwd = "ukq5RZr2aW2uKpn3Zxb3ft1xVjURsUqg"
+pwd = "Lnn123456#"
 opt[12] = true    ; PDO::ATTR_PERSISTENT
 
 ;[model]
