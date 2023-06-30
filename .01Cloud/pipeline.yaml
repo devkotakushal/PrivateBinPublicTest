@@ -1,0 +1,45 @@
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: dockerfile-pipeline
+spec:
+  tasks:
+    - name: clone-repository
+      taskRef:
+        name: git-clone
+      params:
+        - name: url
+          value: https://github.com/devkotakushal/PrivateBintest
+        - name: revision
+          value: test
+
+    - name: build-docker-image
+      taskRef:
+        name: docker-build
+      params:
+        - name: context
+          value: $(workspaces.source.path)
+
+  workspaces:
+    - name: source
+      emptyDir: {}
+
+  tasks:
+    - name: git-clone
+      taskSpec:
+        steps:
+          - name: clone
+            image: alpine/git
+            script: |
+              git clone $(params.url) $(workspaces.source.path)
+              cd $(workspaces.source.path)
+              git checkout $(params.revision)
+
+    - name: docker-build
+      taskSpec:
+        steps:
+          - name: build
+            image: docker
+            script: |
+              cd $(params.context)
+              docker build -t $(params.pathToDockerfile) .
