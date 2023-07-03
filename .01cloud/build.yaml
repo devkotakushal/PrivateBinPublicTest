@@ -1,0 +1,12 @@
+apiVersion: tekton.dev/v1
+kind: Task
+metadata:
+  name: build
+spec:
+  workspaces:
+  - name: workspace
+  steps:
+    - name: build
+      image: docker
+      script: |
+        docker build -t test .

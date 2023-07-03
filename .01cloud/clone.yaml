@@ -1,0 +1,14 @@
+apiVersion: tekton.dev/v1
+kind: Task
+metadata:
+  name: clone
+spec:
+  workspaces:
+  - name: workspace
+  steps:
+    - name: clone
+      image: alpine/git
+      script: |
+        git clone https://github.com/devkotakushal/PrivateBinPublicTest.git
+        cd PrivateBinPublicTest
+        git checkout test
