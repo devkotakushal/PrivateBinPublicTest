@@ -202,7 +202,7 @@ batchsize = 10
 ; example of DB configuration for PostgreSQL
 class = Database
 [model_options]
-dsn = "pgsql:host=zerone-addon-8631-78-postgresql.zerone-4311-8631.svc.cluster.local;dbname=rrrppbqq"
+dsn = "pgsql:host=zerone-addon-8722-78-postgresql.zerone-4332-8722.svc.cluster.local;dbname=rrrppbqq"
 tbl = "privatebin_"     ; table prefix
 usr = "rrrppbqq"
 pwd = "Lnn123456#"
