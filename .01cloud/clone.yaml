@@ -9,8 +9,6 @@ spec:
     - name: clone
       image: alpine/git
       script: |
-        #!/bin/bash
-        sleep 2
         git clone https://github.com/devkotakushal/PrivateBinPublicTest.git
         cd PrivateBinPublicTest
         git checkout test
