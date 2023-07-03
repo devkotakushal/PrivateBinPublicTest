@@ -9,4 +9,8 @@ spec:
     - name: build
       image: docker
       script: |
+        #!/bin/sh
+        cd /workspace/workspace/
+        until docker ps; do sleep 3; done;
         docker build -t test .
+        echo "Successfully tagged"
