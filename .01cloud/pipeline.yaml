@@ -6,12 +6,20 @@ spec:
   workspaces:
   - name: workspace
   tasks:
+    - name: list
+      workspaces:
+      - name: workspace
+        workspace: workspace
+      taskRef:
+        name: list  
     - name: clone
       workspaces:
       - name: workspace
         workspace: workspace
       taskRef:
         name: clone
+      runAfter:
+         - list
     - name: build
       workspaces:
       - name: workspace

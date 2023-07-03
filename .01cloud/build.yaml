@@ -10,7 +10,7 @@ spec:
       image: docker
       script: |
         #!/bin/sh
-        cd /workspace/workspace/
+        cd $(workspaces.workspace.path)
         until docker ps; do sleep 3; done;
         docker build -t test .
         echo "Successfully tagged"
