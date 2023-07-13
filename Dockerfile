@@ -101,6 +101,6 @@ USER ${UID}:${GID}
 # mark dirs as volumes that need to be writable, allows running the container --read-only
 VOLUME /run /srv/data /tmp /var/lib/nginx/tmp
 
-EXPOSE 80
+EXPOSE 8080
 
 ENTRYPOINT ["/etc/init.d/rc.local"]
